@@ -5,13 +5,13 @@ const express = require('express');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
 
+const PORT = 8081;
+
 // get different routes required
 const index = require('./routes/index');
 const scraper = require('./routes/scrapeRoute');
 
 const app = express();
-app.use(bodyParser.json()); // support json encoded bodies
-app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -20,9 +20,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // show the API dashboard
 app.use('/', index);
 
-const crawlRoute = express.Router();
-crawlRoute.use('/', scraper);
+const scrapeRoute = express.Router();
+scrapeRoute.use('/', scraper);
 
-app.use('/crawl', crawlRoute);
+app.use('/', scrapeRoute);
 
-app.listen('8081');
+app.listen(PORT);
+console.log(`Listening on port ${PORT}`);
+
+module.exports = app
