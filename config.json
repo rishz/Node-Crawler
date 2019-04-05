@@ -1,0 +1,7 @@
+{
+  "_comment": "This file is required configure the database",
+  "redisConfig": {
+    "REDIS_HOST": "",
+    "REDIST_PORT": "",
+  }
+}
