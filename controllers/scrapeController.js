@@ -3,16 +3,20 @@ const cheerio = require('cheerio');
 const baseLink = 'https://medium.com';
 const Promise = require('bluebird');
 
-const MAX_COUNT = 1000;
+const MAX_COUNT = 50;
 
 let validateUrl = url => {
 	if(url.startsWith(baseLink)) return true;
 	return false;
 }
 
+let getLink = url => {
+	let query = url.split("?");
+	return query[0];
+}
+
 let getParams = url => {
 	let query = url.split("?");
-	console.log(query);
 	if(!query[1]) return [];
     let vars = query[1].split("&");
     let params = new Set();
@@ -24,12 +28,11 @@ let getParams = url => {
 }
 
 let visitedUrls = [];
-let count = 0;
 
 let makeRequest = url => {
 	validUrls = [];
-	// console.log("url = "+url+" "+count);
 	return new Promise((resolve, reject) => {
+		
 		request(url)
 			.then(html => {
 			    $ = cheerio.load(html);
@@ -39,7 +42,6 @@ let makeRequest = url => {
 				    if(validateUrl(url)){
 				    	console.log(url);
 				    	validUrls.push(url);
-				    	count++;
 				    }
 				});
 				resolve(validUrls);
@@ -49,25 +51,63 @@ let makeRequest = url => {
 			});
 	});
 }
-
-let crawl = urls => {
-	if(count < MAX_COUNT){
-		const allPromise = Promise.map(urls, makeRequest, {concurrency: 5});
+let count = 0;
+let coverFirstLinks = urls => {
+	return new Promise((resolve, reject) => {
+		otherUrls = [];
+		let allPromise = Promise.map(urls, makeRequest, {concurrency: 5});
 		allPromise.then(allValues => {
 		  	allValues.forEach(result => {
-		  		result.forEach(url => visitedUrls.push(url));
-		  		crawl(result);
+		  		result.forEach(url => {
+		  			visitedUrls.push(url)
+		  			otherUrls.push(url);
+		  		});
 		  	});
+		  	console.log("OTHER ONES -> " + otherUrls);
+		  	resolve(otherUrls);
 		});
-	}else{
-		return visitedUrls;
-	}
+	});
 }
 
+let crawl = urls => {
+	return new Promise((resolve, reject) => {
+		coverFirstLinks(urls)
+			.then(otherUrls => coverFirstLinks(otherUrls))
+			.then(() => resolve(visitedUrls));
+	});
+}
+
+let processUrls = urls => {
+	console.log("LEN "+urls.length);
+	return new Promise((resolve, reject) => {
+		console.log(urls.length);
+		let result = new Object();
+
+		urls.forEach(url => {
+			let val = getLink(url);
+			let params = getParams(url);
+			if(val in result){
+				obj = result[val];
+				obj.count++;
+				params.forEach(param => {
+					obj.params.add(param);
+				});
+			}else{
+				obj = {};
+				obj.count = 1;
+				obj.params = params;
+			}
+			result[val] = obj;
+		});
+		console.log(result);
+	});
+}
 
 exports.scrape = url => {
-	console.log(`Scraping ${url}`);
-	linksToVisit.push(url);
-	const result = crawl([url]);
-	console.log(result.length);
+	return new Promise((resolve, reject) => {
+		console.log(`Scraping ${url}`);
+		crawl([url])
+			.then(result => processUrls(result))
+			.then(list => resolve(list));
+	});
 }
