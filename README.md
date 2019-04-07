@@ -7,7 +7,8 @@ A dockerized Web Crawler built in Node.js
 
 ## Usage
   - `curl -X GET http://localhost:80/scrape`
-
+  - See the Output in `output.txt`
+  
 ## Dependencies used
 
 * Express.js
