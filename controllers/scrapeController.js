@@ -9,7 +9,8 @@ const fs = require('fs');
 
 // Configuring mongoose
 mongoose.Promise = global.Promise;
-mongoose.connect("mongodb://localhost:27017/nodecrawler");
+mongoose.connect("mongodb://mongo:27017/nodecrawler");
+// mongoose.connect("mongodb://localhost:27017/nodecrawler");
 
 // When successfully connected
 mongoose.connection.on('connected', () => {
@@ -168,12 +169,17 @@ let saveToFile = () => {
 				data.push(JSON.stringify(obj));
 				data.push('\n');
 			});
-		    fs.writeFile("output.txt", data, err => {
+			fs.writeFile("output.txt", "", err => {
 				if(err) {
 				    reject(err);
 				}
-				console.log('Saved!');
-				resolve();
+				fs.writeFile("output.txt", data, err => {
+					if(err) {
+					    reject(err);
+					}
+					console.log('Saved!');
+					resolve();
+				}); 
 			}); 
 		});
 	});
