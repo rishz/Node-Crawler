@@ -11,7 +11,7 @@ A dockerized Web Crawler built in Node.js
 
 ## Dependencies used
 
-* Express - Fast, unopinionated, minimalist web framework for node.
-* MongoDB (Using Mongoose) - An object modeling tool designed to work in an asynchronous environment.
-* Cheeerio - Fast, flexible, and lean implementation of core jQuery designed specifically for the server.
-* Request - Simplified HTTP request client.
+* Express - *Fast, unopinionated, minimalist web framework for node.*
+* MongoDB (Using Mongoose) - *An object modeling tool designed to work in an asynchronous environment.*
+* Cheeerio - *Fast, flexible, and lean implementation of core jQuery designed specifically for the server.*
+* Request - *Simplified HTTP request client.*
