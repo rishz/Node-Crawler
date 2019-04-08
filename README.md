@@ -3,7 +3,7 @@
 A dockerized Web Crawler built in Node.js
 
 ## Installation
-  - `docker-compose up`
+  - `docker-compose up --build`
 
 ## Usage
   - `curl -X GET http://localhost:80/scrape`
